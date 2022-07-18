@@ -196,6 +196,7 @@
     <ClCompile Include="Settings\PathPane.cpp" />
     <ClCompile Include="Settings\USBDeviceAddToWhitelistDialog.cpp" />
     <ClCompile Include="Settings\WiiPane.cpp" />
+    <ClCompile Include="SkylanderPortal\SkylanderPortalWindow.cpp" />
     <ClCompile Include="TAS\GCTASInputWindow.cpp" />
     <ClCompile Include="TAS\IRWidget.cpp" />
     <ClCompile Include="TAS\StickWidget.cpp" />
@@ -332,6 +333,7 @@
     <QtMoc Include="DiscordJoinRequestDialog.h" />
     <QtMoc Include="FIFO\FIFOAnalyzer.h" />
     <QtMoc Include="FIFO\FIFOPlayerWindow.h" />
+    <QtMoc Include="SkylanderPortal\SkylanderPortalWindow.h" />
     <QtMoc Include="GameList\GameList.h" />
     <QtMoc Include="GameList\GameListModel.h" />
     <QtMoc Include="GameList\GameTracker.h" />

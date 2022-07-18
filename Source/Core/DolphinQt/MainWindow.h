@@ -23,6 +23,7 @@ class ControllersWindow;
 class DiscordHandler;
 class DragEnterEvent;
 class FIFOPlayerWindow;
+class SkylanderPortalWindow;
 class FreeLookWindow;
 class GameList;
 class GCTASInputWindow;
@@ -155,6 +156,7 @@ private:
   void ShowNetPlaySetupDialog();
   void ShowNetPlayBrowser();
   void ShowFIFOPlayer();
+  void ShowSkylanderPortal();
   void ShowMemcardManager();
   void ShowResourcePackManager();
   void ShowCheatsManager();
@@ -216,6 +218,7 @@ private:
   SettingsWindow* m_settings_window = nullptr;
   GraphicsWindow* m_graphics_window = nullptr;
   FIFOPlayerWindow* m_fifo_window = nullptr;
+  SkylanderPortalWindow* m_skylander_window = nullptr;
   MappingWindow* m_hotkey_window = nullptr;
   FreeLookWindow* m_freelook_window = nullptr;
 

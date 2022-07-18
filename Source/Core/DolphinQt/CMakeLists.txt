@@ -62,6 +62,8 @@ add_executable(dolphin-emu
   SearchBar.h
   Settings.cpp
   Settings.h
+  SkylanderPortal/SkylanderPortalWindow.cpp
+  SkylanderPortal/SkylanderPortalWindow.h
   ToolBar.cpp
   ToolBar.h
   Translation.cpp
