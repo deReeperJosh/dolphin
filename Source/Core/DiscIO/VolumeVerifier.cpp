@@ -261,7 +261,7 @@ std::vector<RedumpVerifier::PotentialMatch> RedumpVerifier::ScanDatfile(const st
       // disc with the game ID "G96P" and the serial "DL-DOL-D96P-EUR, DL-DOL-G96P-EUR".
       for (const std::string& serial_str : SplitString(serials, ','))
       {
-        const std::string_view serial = StripSpaces(serial_str);
+        const std::string_view serial = StripWhitespace(serial_str);
 
         // Skip the prefix, normally either "DL-DOL-" or "RVL-" (depending on the console),
         // but there are some exceptions like the "RVLE-SBSE-USA-B0" serial.
@@ -640,10 +640,12 @@ bool VolumeVerifier::CheckPartition(const Partition& partition)
       {
         const std::string ios_ver_str = std::to_string(ios_ver);
         const std::string correct_ios =
-            IsDebugSigned() ? ("firmware.64." + ios_ver_str + ".") : ("IOS" + ios_ver_str + "-");
+            IsDebugSigned() ? ("firmware.64." + ios_ver_str + ".") : ("ios" + ios_ver_str + "-");
         for (const FileInfo& f : *file_info)
         {
-          if (StringBeginsWith(f.GetName(), correct_ios))
+          std::string file_name = f.GetName();
+          Common::ToLower(&file_name);
+          if (StringBeginsWith(file_name, correct_ios))
           {
             has_correct_ios = true;
             break;
