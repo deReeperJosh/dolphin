@@ -658,7 +658,7 @@ CreateSkylanderDialog::CreateSkylanderDialog(QWidget* parent) : QDialog(parent)
   QLabel* label_var = new QLabel(tr("Variant:"));
   QLineEdit* edit_id = new QLineEdit(QString::fromStdString("0"));
   QLineEdit* edit_var = new QLineEdit(QString::fromStdString("0"));
-  QRegExpValidator* rxv = new QRegExpValidator(QRegExp(QString::fromStdString("\\d*")), this);
+  QRegularExpressionValidator* rxv = new QRegularExpressionValidator(QRegularExpression(QString::fromStdString("\\d*")), this);
   edit_id->setValidator(rxv);
   edit_var->setValidator(rxv);
   hbox_idvar->addWidget(label_id);
