@@ -82,6 +82,7 @@ private:
   void DispatchHooks(const DeviceChangeHooks& hooks);
 
   bool m_has_initialised = false;
+  bool emulate_skylander_portal = true;
   LibusbUtils::Context m_context;
 };
 }  // namespace IOS::HLE
