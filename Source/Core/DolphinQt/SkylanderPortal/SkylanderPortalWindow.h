@@ -14,7 +14,7 @@ class QPushButton;
 class QSpinBox;
 class QTabWidget;
 
-constexpr auto UI_SKY_NUM = 4;
+constexpr auto UI_SKY_NUM = 8;
 
 class SkylanderPortalWindow : public QWidget
 {

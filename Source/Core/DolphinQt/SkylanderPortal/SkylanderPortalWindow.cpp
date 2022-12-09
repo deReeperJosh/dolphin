@@ -1,3 +1,6 @@
+// DolphinQt code copied and modified for Dolphin from the RPCS3 Qt utility for Creating, Loading
+// and Clearing skylanders
+
 #include "DolphinQt/SkylanderPortal/SkylanderPortalWindow.h"
 
 #include <QComboBox>
@@ -720,29 +723,22 @@ CreateSkylanderDialog::CreateSkylanderDialog(QWidget* parent) : QDialog(parent)
     std::array<u8, 0x40 * 0x10> buf{};
     const auto file_data = buf.data();
     // Set the block permissions
-    // *utils::bless<le_t<u32>>(&file_data[0x36]) = 0x690F0F0F;
     u32 first_block = 0x690F0F0F;
     u32 other_blocks = 0x69080F7F;
     memcpy(&file_data[0x36], &first_block, sizeof(first_block));
     for (u32 index = 1; index < 0x10; index++)
     {
-      //   *utils::bless<le_t<u32>>(&file_data[(index * 0x40) + 0x36]) = 0x69080F7F;
       memcpy(&file_data[(index * 0x40) + 0x36], &other_blocks, sizeof(other_blocks));
     }
     // Set the skylander info
-    // *utils::bless<le_t<u16>>(&file_data[0]) = (sky_id | sky_var) + 1;
     u16 sky_info = (sky_id | sky_var) + 1;
     memcpy(&file_data[0], &sky_info, sizeof(sky_info));
-    // *utils::bless<le_t<u16>>(&file_data[0x10]) = sky_id;
     memcpy(&file_data[0x10], &sky_id, sizeof(sky_id));
-    // *utils::bless<le_t<u16>>(&file_data[0x1C]) = sky_var;
     memcpy(&file_data[0x1C], &sky_var, sizeof(sky_var));
-    // // Set checksum
-    // *utils::bless<le_t<u16>>(&file_data[0x1E]) = skylander_crc16(0xFFFF, file_data, 0x1E);
+    // Set checksum
     u16 checksum = skylander_crc16(0xFFFF, file_data, 0x1E);
     memcpy(&file_data[0x1E], &checksum, sizeof(checksum));
 
-    // sky_file.write(buf.data(), buf.size());
     sky_file.WriteBytes(buf.data(), buf.size());
     sky_file.Close();
 
@@ -788,7 +784,7 @@ void SkylanderPortalWindow::LoadSkylander(u8 slot)
 
 void SkylanderPortalWindow::LoadSkylanderPath(u8 slot, const QString& path)
 {
-  File::IOFile sky_file(path.toStdString(), "r+");
+  File::IOFile sky_file(path.toStdString(), "rb");
   if (!sky_file)
   {
     QMessageBox::warning(

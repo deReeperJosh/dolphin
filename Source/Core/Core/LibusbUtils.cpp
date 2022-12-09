@@ -118,7 +118,7 @@ class Context::Impl
 public:
   libusb_context* GetContext() const { return nullptr; }
   int GetDeviceList(GetDeviceListCallback callback) const { return -1; }
-  bool CheckDevice(u16 id_vendor, u16 id_product_min, u16 id_product_max) const {return false;};
+  bool CheckDevice(u16 id_vendor, u16 id_product_min, u16 id_product_max) const { return false; };
 };
 #endif
 
