@@ -149,16 +149,7 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
                       0x00, 0x00,   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
           q_queries.push(q_result);
           cmd->expected_count = 10;
-
-          if (q_data[1] == 1)
-          {
-            g_skyportal.Activate();
-          }
-          else
-          {
-            g_skyportal.Deactivate();
-          }
-          
+          g_skyportal.Activate();
         }
         break;
       }
@@ -195,8 +186,9 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
 
         // buf[5] is unknown. Observed values are 0x00, 0x0D and 0xF4
 
-        // buf[6] is the fade duration. Exact value-time corrolation unknown. Observed values are 0x00, 0x01 and 0x07.
-        // Custom commands show that the higher this value the longer the duration.
+        // buf[6] is the fade duration. Exact value-time corrolation unknown. Observed values are
+        // 0x00, 0x01 and 0x07. Custom commands show that the higher this value the longer the
+        // duration.
 
         // Empty J response is send after the fade is completed. Immeditately sending it is fine
         // as long as we don't show the fade happening
@@ -239,7 +231,6 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
             side = 0x04;
           }
           g_skyportal.SetLEDs(side, buf[2], buf[3], buf[4]);
-
         }
         break;
       }
@@ -335,8 +326,9 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
       case 'S':
       {
         q_data = {buf[0]};
+        q_result = g_skyportal.GetStatus();
+        q_queries.push(q_result);
         cmd->expected_count = 9;
-        g_skyportal.UpdateStatus();
         break;
       }
       case 'V':
@@ -436,7 +428,7 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<IntrMessage> cmd)
   }
   else
   {
-    q_result = g_skyportal.GetStatus(buf);
+    q_result = g_skyportal.GetStatus();
     cmd->expected_time = Common::Timer::NowUs() + 2000;
   }
   cmd->expected_count = 32;
@@ -555,7 +547,7 @@ void SkylanderPortal::Deactivate()
   activated = false;
 }
 
-bool SkylanderPortal::IsActivates()
+bool SkylanderPortal::IsActivated()
 {
   std::lock_guard lock(sky_mutex);
 
@@ -619,11 +611,11 @@ void SkylanderPortal::SetLEDs(u8 side, u8 red, u8 green, u8 blue)
   }
 }
 
-std::array<u8, 64> SkylanderPortal::GetStatus(u8* reply_buf)
+std::array<u8, 64> SkylanderPortal::GetStatus()
 {
   std::lock_guard lock(sky_mutex);
 
-  u16 status = 0;
+  u32 status = 0;
   u8 active = 0x00;
 
   if (activated)
@@ -631,7 +623,7 @@ std::array<u8, 64> SkylanderPortal::GetStatus(u8* reply_buf)
     active = 0x01;
   }
 
-  for (int i = 7; i >= 0; i--)
+  for (int i = MAX_SKYLANDERS - 1; i >= 0; i--)
   {
     auto& s = skylanders[i];
 
@@ -643,9 +635,6 @@ std::array<u8, 64> SkylanderPortal::GetStatus(u8* reply_buf)
     status <<= 2;
     status |= s.status;
   }
-
-  std::memset(reply_buf, 0, 0x20);
-  // write_to_ptr<le_t<u16>>(reply_buf, 1, status);
 
   std::array<u8, 64> q_result = {0x53,   0x00, 0x00, 0x00, 0x00, interrupt_counter++,
                                  active, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -719,7 +708,6 @@ u8 SkylanderPortal::LoadSkylander(u8* buf, File::IOFile in_file)
 {
   std::lock_guard lock(sky_mutex);
 
-  // u32 sky_serial = *utils::bless<le_t<u32>>(buf);
   u32 sky_serial = 0;
   for (int i = 3; i > -1; i--)
   {

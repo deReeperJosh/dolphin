@@ -1,3 +1,6 @@
+// DolphinQt code copied and modified for Dolphin from the RPCS3 Qt utility for Creating, Loading
+// and Clearing skylanders
+
 #include "DolphinQt/SkylanderPortal/SkylanderPortalWindow.h"
 
 #include <QComboBox>
@@ -10,18 +13,17 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QString>
 #include <QStringList>
 #include <QVBoxLayout>
 
 #include "Common/IOFile.h"
 
-#include "Core/IOS/USB/Emulated/Skylander.h"
-
 #include "DolphinQt/QtUtils/DolphinFileDialog.h"
 
 SkylanderPortalWindow* SkylanderPortalWindow::inst = nullptr;
-std::optional<std::tuple<u8, u16, u16>> SkylanderPortalWindow::sky_slots[UI_SKY_NUM];
+std::optional<std::tuple<u8, u16, u16>> SkylanderPortalWindow::sky_slots[MAX_SKYLANDERS];
 QString last_skylander_path;
 
 const std::map<const std::pair<const u16, const u16>, const std::string> list_skylanders = {
@@ -566,8 +568,9 @@ void SkylanderPortalWindow::CreateMainWindow()
 
   QGroupBox* group_skylanders = new QGroupBox(tr("Active Portal Skylanders:"));
   QVBoxLayout* vbox_group = new QVBoxLayout();
+  QScrollArea* scroll_area = new QScrollArea();
 
-  for (auto i = 0; i < UI_SKY_NUM; i++)
+  for (auto i = 0; i < MAX_SKYLANDERS; i++)
   {
     if (i != 0)
     {
@@ -597,7 +600,9 @@ void SkylanderPortalWindow::CreateMainWindow()
   }
 
   group_skylanders->setLayout(vbox_group);
-  mainLayout->addWidget(group_skylanders);
+  scroll_area->setWidget(group_skylanders);
+  scroll_area->setWidgetResizable(true);
+  mainLayout->addWidget(scroll_area);
   setLayout(mainLayout);
 
   UpdateEdits();
@@ -708,7 +713,7 @@ CreateSkylanderDialog::CreateSkylanderDialog(QWidget* parent) : QDialog(parent)
       return;
     }
 
-    File::IOFile sky_file(file_path.toStdString(), "wb");
+    File::IOFile sky_file(file_path.toStdString(), "w+b");
     if (!sky_file)
     {
       QMessageBox::warning(this, tr("Failed to create skylander file!"),
@@ -720,29 +725,22 @@ CreateSkylanderDialog::CreateSkylanderDialog(QWidget* parent) : QDialog(parent)
     std::array<u8, 0x40 * 0x10> buf{};
     const auto file_data = buf.data();
     // Set the block permissions
-    // *utils::bless<le_t<u32>>(&file_data[0x36]) = 0x690F0F0F;
     u32 first_block = 0x690F0F0F;
     u32 other_blocks = 0x69080F7F;
     memcpy(&file_data[0x36], &first_block, sizeof(first_block));
     for (u32 index = 1; index < 0x10; index++)
     {
-      //   *utils::bless<le_t<u32>>(&file_data[(index * 0x40) + 0x36]) = 0x69080F7F;
       memcpy(&file_data[(index * 0x40) + 0x36], &other_blocks, sizeof(other_blocks));
     }
     // Set the skylander info
-    // *utils::bless<le_t<u16>>(&file_data[0]) = (sky_id | sky_var) + 1;
     u16 sky_info = (sky_id | sky_var) + 1;
     memcpy(&file_data[0], &sky_info, sizeof(sky_info));
-    // *utils::bless<le_t<u16>>(&file_data[0x10]) = sky_id;
     memcpy(&file_data[0x10], &sky_id, sizeof(sky_id));
-    // *utils::bless<le_t<u16>>(&file_data[0x1C]) = sky_var;
     memcpy(&file_data[0x1C], &sky_var, sizeof(sky_var));
-    // // Set checksum
-    // *utils::bless<le_t<u16>>(&file_data[0x1E]) = skylander_crc16(0xFFFF, file_data, 0x1E);
+    // Set checksum
     u16 checksum = skylander_crc16(0xFFFF, file_data, 0x1E);
     memcpy(&file_data[0x1E], &checksum, sizeof(checksum));
 
-    // sky_file.write(buf.data(), buf.size());
     sky_file.WriteBytes(buf.data(), buf.size());
     sky_file.Close();
 
@@ -788,7 +786,7 @@ void SkylanderPortalWindow::LoadSkylander(u8 slot)
 
 void SkylanderPortalWindow::LoadSkylanderPath(u8 slot, const QString& path)
 {
-  File::IOFile sky_file(path.toStdString(), "r+");
+  File::IOFile sky_file(path.toStdString(), "r+b");
   if (!sky_file)
   {
     QMessageBox::warning(
@@ -840,7 +838,7 @@ void SkylanderPortalWindow::ClearSkylander(u8 slot)
 
 void SkylanderPortalWindow::UpdateEdits()
 {
-  for (auto i = 0; i < UI_SKY_NUM; i++)
+  for (auto i = 0; i < MAX_SKYLANDERS; i++)
   {
     QString display_string;
     if (auto sd = sky_slots[i])

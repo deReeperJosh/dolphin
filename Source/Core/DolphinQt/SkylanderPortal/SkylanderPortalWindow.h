@@ -7,14 +7,13 @@
 #include <QWidget>
 
 #include "Core/Core.h"
+#include "Core/IOS/USB/Emulated/Skylander.h"
 
 class QDialogButtonBox;
 class QLabel;
 class QPushButton;
 class QSpinBox;
 class QTabWidget;
-
-constexpr auto UI_SKY_NUM = 4;
 
 class SkylanderPortalWindow : public QWidget
 {
@@ -24,8 +23,8 @@ public:
   ~SkylanderPortalWindow();
 
 protected:
-  QLineEdit* edit_skylanders[UI_SKY_NUM]{};
-  static std::optional<std::tuple<u8, u16, u16>> sky_slots[UI_SKY_NUM];
+  QLineEdit* edit_skylanders[MAX_SKYLANDERS]{};
+  static std::optional<std::tuple<u8, u16, u16>> sky_slots[MAX_SKYLANDERS];
 
 private:
   void CreateMainWindow();
