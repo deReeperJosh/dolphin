@@ -623,7 +623,7 @@ std::array<u8, 64> SkylanderPortal::GetStatus()
 {
   std::lock_guard lock(sky_mutex);
 
-  u16 status = 0;
+  u32 status = 0;
   u8 active = 0x00;
 
   if (activated)
@@ -631,7 +631,7 @@ std::array<u8, 64> SkylanderPortal::GetStatus()
     active = 0x01;
   }
 
-  for (int i = 7; i >= 0; i--)
+  for (int i = MAX_SKYLANDERS - 1; i >= 0; i--)
   {
     auto& s = skylanders[i];
 

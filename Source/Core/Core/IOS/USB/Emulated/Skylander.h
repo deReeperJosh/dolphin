@@ -12,6 +12,8 @@
 #include "Common/IOFile.h"
 #include "Core/IOS/USB/EmulatedUsbDevice.h"
 
+#define MAX_SKYLANDERS 8
+
 namespace IOS::HLE::USB
 {
 class SkylanderUsb final : public EmulatedUsbDevice
@@ -110,7 +112,7 @@ protected:
   LedColor color_left = {};
   LedColor color_trap = {};
 
-  Skylander skylanders[8];
+  Skylander skylanders[MAX_SKYLANDERS];
 };
 
 extern SkylanderPortal g_skyportal;

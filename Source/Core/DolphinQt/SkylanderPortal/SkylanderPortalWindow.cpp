@@ -19,12 +19,10 @@
 
 #include "Common/IOFile.h"
 
-#include "Core/IOS/USB/Emulated/Skylander.h"
-
 #include "DolphinQt/QtUtils/DolphinFileDialog.h"
 
 SkylanderPortalWindow* SkylanderPortalWindow::inst = nullptr;
-std::optional<std::tuple<u8, u16, u16>> SkylanderPortalWindow::sky_slots[UI_SKY_NUM];
+std::optional<std::tuple<u8, u16, u16>> SkylanderPortalWindow::sky_slots[MAX_SKYLANDERS];
 QString last_skylander_path;
 
 const std::map<const std::pair<const u16, const u16>, const std::string> list_skylanders = {
@@ -570,7 +568,7 @@ void SkylanderPortalWindow::CreateMainWindow()
   QGroupBox* group_skylanders = new QGroupBox(tr("Active Portal Skylanders:"));
   QVBoxLayout* vbox_group = new QVBoxLayout();
 
-  for (auto i = 0; i < UI_SKY_NUM; i++)
+  for (auto i = 0; i < MAX_SKYLANDERS; i++)
   {
     if (i != 0)
     {
@@ -836,7 +834,7 @@ void SkylanderPortalWindow::ClearSkylander(u8 slot)
 
 void SkylanderPortalWindow::UpdateEdits()
 {
-  for (auto i = 0; i < UI_SKY_NUM; i++)
+  for (auto i = 0; i < MAX_SKYLANDERS; i++)
   {
     QString display_string;
     if (auto sd = sky_slots[i])
