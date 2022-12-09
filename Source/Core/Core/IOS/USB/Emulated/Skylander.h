@@ -12,7 +12,10 @@
 #include "Common/IOFile.h"
 #include "Core/IOS/USB/EmulatedUsbDevice.h"
 
-#define MAX_SKYLANDERS 8
+// The maximum possible characters the portal can handle.
+// The status array is 32 bits and every character takes 2 bits.
+// 32/2 = 16
+#define MAX_SKYLANDERS 16
 
 namespace IOS::HLE::USB
 {
