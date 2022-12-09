@@ -15,8 +15,6 @@ class QPushButton;
 class QSpinBox;
 class QTabWidget;
 
-constexpr auto UI_SKY_NUM = 16;
-
 class SkylanderPortalWindow : public QWidget
 {
   Q_OBJECT
@@ -25,8 +23,8 @@ public:
   ~SkylanderPortalWindow();
 
 protected:
-  QLineEdit* edit_skylanders[UI_SKY_NUM]{};
-  static std::optional<std::tuple<u8, u16, u16>> sky_slots[UI_SKY_NUM];
+  QLineEdit* edit_skylanders[MAX_SKYLANDERS]{};
+  static std::optional<std::tuple<u8, u16, u16>> sky_slots[MAX_SKYLANDERS];
 
 private:
   void CreateMainWindow();

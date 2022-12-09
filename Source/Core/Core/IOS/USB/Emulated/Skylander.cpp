@@ -319,7 +319,6 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
       {
         q_data = {buf[0]};
         cmd->expected_count = 9;
-        g_skyportal.UpdateStatus();
         break;
       }
       case 'V':
@@ -692,7 +691,6 @@ u8 SkylanderPortal::LoadSkylander(u8* buf, File::IOFile in_file)
 {
   std::lock_guard lock(sky_mutex);
 
-  // u32 sky_serial = *utils::bless<le_t<u32>>(buf);
   u32 sky_serial = 0;
   for (int i = 3; i > -1; i--)
   {
