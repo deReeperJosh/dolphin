@@ -784,7 +784,7 @@ void SkylanderPortalWindow::LoadSkylander(u8 slot)
 
 void SkylanderPortalWindow::LoadSkylanderPath(u8 slot, const QString& path)
 {
-  File::IOFile sky_file(path.toStdString(), "rb");
+  File::IOFile sky_file(path.toStdString(), "r+b");
   if (!sky_file)
   {
     QMessageBox::warning(
