@@ -79,13 +79,19 @@ struct Skylander final
   void save();
 };
 
+struct LedColor final
+{
+  u8 r = 0, g = 0, b = 0;
+};
+
 class SkylanderPortal final
 {
 public:
   void Activate();
   void Deactivate();
+  bool IsActivates();
   void UpdateStatus();
-  void SetLEDs(u8 r, u8 g, u8 b);
+  void SetLEDs(u8 side, u8 r, u8 g, u8 b);
 
   std::array<u8, 64> GetStatus(u8* buf);
   void QueryBlock(u8 sky_num, u8 block, u8* reply_buf);
@@ -100,7 +106,9 @@ protected:
   bool activated = true;
   bool status_updated = false;
   u8 interrupt_counter = 0;
-  u8 r = 0, g = 0, b = 0;
+  LedColor color_right = {};
+  LedColor color_left = {};
+  LedColor color_trap = {};
 
   Skylander skylanders[8];
 };
