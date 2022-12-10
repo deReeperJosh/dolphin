@@ -12,6 +12,11 @@
 #include "Common/IOFile.h"
 #include "Core/IOS/USB/EmulatedUsbDevice.h"
 
+// The maximum possible characters the portal can handle.
+// The status array is 32 bits and every character takes 2 bits.
+// 32/2 = 16
+constexpr u8 MAX_SKYLANDERS = 16;
+
 namespace IOS::HLE::USB
 {
 class SkylanderUsb final : public EmulatedUsbDevice
@@ -110,7 +115,7 @@ protected:
   LedColor color_left = {};
   LedColor color_trap = {};
 
-  Skylander skylanders[8];
+  Skylander skylanders[MAX_SKYLANDERS];
 };
 
 extern SkylanderPortal g_skyportal;

@@ -149,15 +149,7 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
                       0x00, 0x00,   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
           q_queries.push(q_result);
           cmd->expected_count = 10;
-
-          if (q_data[1] == 1)
-          {
-            g_skyportal.Activate();
-          }
-          else
-          {
-            g_skyportal.Deactivate();
-          }
+          g_skyportal.Activate();
         }
         break;
       }
@@ -623,7 +615,7 @@ std::array<u8, 64> SkylanderPortal::GetStatus()
 {
   std::lock_guard lock(sky_mutex);
 
-  u16 status = 0;
+  u32 status = 0;
   u8 active = 0x00;
 
   if (activated)
@@ -631,7 +623,7 @@ std::array<u8, 64> SkylanderPortal::GetStatus()
     active = 0x01;
   }
 
-  for (int i = 7; i >= 0; i--)
+  for (int i = MAX_SKYLANDERS - 1; i >= 0; i--)
   {
     auto& s = skylanders[i];
 
