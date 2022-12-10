@@ -221,7 +221,6 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
         if (cmd->length == 5)
         {
           q_data = {buf[0], buf[1], buf[2], buf[3], buf[4]};
-          g_skyportal.SetLEDs(buf[1], buf[2], buf[3], buf[4]);
           cmd->expected_count = 13;
         }
         break;
@@ -700,7 +699,7 @@ u8 SkylanderPortal::LoadSkylander(u8* buf, File::IOFile in_file)
   u8 found_slot = 0xFF;
 
   // mimics spot retaining on the portal
-  for (auto i = 0; i < 16; i++)
+  for (auto i = 0; i < MAX_SKYLANDERS; i++)
   {
     if ((skylanders[i].status & 1) == 0)
     {
