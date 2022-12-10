@@ -121,6 +121,17 @@ bool USBHost::AddNewDevices(std::set<u64>& new_devices, DeviceChangeHooks& hooks
   {
     INFO_LOG_FMT(IOS_USB, "Found Skylander Portal");
     emulate_skylander_portal = false;
+    if (skylander_portal_id != 0)
+    {
+      auto portal = m_devices[skylander_portal_id];
+      portal.reset();
+      m_devices.erase(skylander_portal_id);
+      skylander_portal_id = 0;
+    }
+  }
+  else
+  {
+    emulate_skylander_portal = true;
   }
   if (emulate_skylander_portal)
   {
@@ -128,7 +139,10 @@ bool USBHost::AddNewDevices(std::set<u64>& new_devices, DeviceChangeHooks& hooks
     const u64 skyid = skylanderportal->GetId();
     new_devices.insert(skyid);
     if (AddDevice(std::move(skylanderportal)))
+    {
       hooks.emplace(GetDeviceById(skyid), ChangeEvent::Inserted);
+      skylander_portal_id = skyid;
+    }
   }
   auto whitelist = Config::GetUSBDeviceWhitelist();
   if (whitelist.empty())

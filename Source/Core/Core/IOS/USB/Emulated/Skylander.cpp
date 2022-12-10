@@ -371,12 +371,8 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
       break;
     case 0x0A:
       cmd->expected_count = 8;
-      cmd->OnTransferComplete(8);
-      return 0;
     case 0x0B:
       cmd->expected_count = 8;
-      cmd->OnTransferComplete(8);
-      return 0;
     default:
       ERROR_LOG_FMT(IOS_USB, "Unhandled Request {}", cmd->request);
       break;
@@ -396,6 +392,11 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<BulkMessage> cmd)
                 m_active_interface, cmd->length, cmd->endpoint);
   return 0;
 }
+
+// When an Interrupt Message is received by the Skylander Portal from the console,
+// it needs to respond with either the status of the console if there are no Control Messages that
+// require a response, or with the relevant response data that is requested from the Control
+// Message.
 int SkylanderUsb::SubmitTransfer(std::unique_ptr<IntrMessage> cmd)
 {
   DEBUG_LOG_FMT(IOS_USB, "[{:04x}:{:04x} {}] Interrupt: length={} endpoint={}", m_vid, m_pid,
@@ -405,6 +406,8 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<IntrMessage> cmd)
   auto& memory = system.GetMemory();
   u8* buf = memory.GetPointerForRange(cmd->data_address, cmd->length);
   std::array<u8, 64> q_result = {};
+  // Audio requests are 64 bytes long, are the only Interrupt requests longer than 32 bytes,
+  // echo the request as the response and respond after 1ms
   if (cmd->length > 32)
   {
     std::array<u8, 64> q_audio_result = {};
@@ -415,6 +418,8 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<IntrMessage> cmd)
     GetTransferThread().AddTransfer(std::move(cmd), q_audio_result);
     return 0;
   }
+  // If some data was requested from the Control Message, then the Interrupt message needs to
+  // respond with that data. Check if the queries queue is empty
   if (!q_queries.empty())
   {
     q_result = q_queries.front();
@@ -422,6 +427,7 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<IntrMessage> cmd)
     // This needs to happen after ~22 milliseconds
     cmd->expected_time = Common::Timer::NowUs() + 22000;
   }
+  // If there is no relevant data to respond with, respond with the currentstatus of the Portal
   else
   {
     q_result = g_skyportal.GetStatus();
