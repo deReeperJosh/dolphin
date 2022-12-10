@@ -168,7 +168,7 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
         // is silently ignored and do not require a response.
         if (cmd->length == 4 || cmd->length == 32)
         {
-          g_skyportal.SetLEDs(buf[1], buf[2], buf[3]);
+          g_skyportal.SetLEDs(0x01, buf[1], buf[2], buf[3]);
           q_data = {0x43, buf[1], buf[2], buf[3]};
           cmd->expected_count = 12;
         }
@@ -176,22 +176,52 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
       }
       case 'J':
       {
-        // Sync status from game?
+        // Sided color
+        // buf[1] is the side
+        // 0x00: right
+        // 0x01: left and right
+        // 0x02: left
+
+        // buf[2], buf[3] and buf[4] are red, green and blue
+
+        // buf[5] is unknown. Observed values are 0x00, 0x0D and 0xF4
+
+        // buf[6] is the fade duration. Exact value-time corrolation unknown. Observed values are
+        // 0x00, 0x01 and 0x07. Custom commands show that the higher this value the longer the
+        // duration.
+
+        // Empty J response is send after the fade is completed. Immeditately sending it is fine
+        // as long as we don't show the fade happening
         if (cmd->length == 7)
         {
           q_data = {buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6]};
           cmd->expected_count = 15;
           q_result = {buf[0]};
           q_queries.push(q_result);
+          g_skyportal.SetLEDs(buf[1], buf[2], buf[3], buf[4]);
         }
         break;
       }
       case 'L':
       {
-        // Audio Download status?
+        // Light
+        // This command is used while playing audio through the portal
+
+        // buf[1] is the position
+        // 0x00: right
+        // 0x01: trap led
+        // 0x02: left
+
+        // buf[2], buf[3] and buf[4] are red, green and blue
+        // the trap led is white-only
+        // increasing or decreasing the values results in a birghter or dimmer light
+
+        // buf[5] is unknown.
+        // A range of values have been observed
         if (cmd->length == 5)
         {
           q_data = {buf[0], buf[1], buf[2], buf[3], buf[4]};
+          g_skyportal.SetLEDs(buf[1], buf[2], buf[3], buf[4]);
           cmd->expected_count = 13;
         }
         break;
@@ -389,7 +419,7 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<IntrMessage> cmd)
   }
   else
   {
-    q_result = g_skyportal.GetStatus(buf);
+    q_result = g_skyportal.GetStatus();
     cmd->expected_time = Common::Timer::NowUs() + 2000;
   }
   cmd->expected_count = 32;
@@ -527,19 +557,49 @@ void SkylanderPortal::UpdateStatus()
   }
 }
 
-void SkylanderPortal::SetLEDs(u8 red, u8 green, u8 blue)
+// Side:
+// 0x00 = right
+// 0x01 = left and right
+// 0x02 = left
+// 0x03 = trap
+void SkylanderPortal::SetLEDs(u8 side, u8 red, u8 green, u8 blue)
 {
   std::lock_guard lock(sky_mutex);
-  this->r = red;
-  this->g = green;
-  this->b = blue;
+  if (side == 0x00)
+  {
+    this->color_right.r = red;
+    this->color_right.g = green;
+    this->color_right.b = blue;
+  }
+  else if (side == 0x01)
+  {
+    this->color_right.r = red;
+    this->color_right.g = green;
+    this->color_right.b = blue;
+
+    this->color_left.r = red;
+    this->color_left.g = green;
+    this->color_left.b = blue;
+  }
+  else if (side == 0x02)
+  {
+    this->color_left.r = red;
+    this->color_left.g = green;
+    this->color_left.b = blue;
+  }
+  else if (side == 0x03)
+  {
+    this->color_trap.r = red;
+    this->color_trap.g = green;
+    this->color_trap.b = blue;
+  }
 }
 
-std::array<u8, 64> SkylanderPortal::GetStatus(u8* reply_buf)
+std::array<u8, 64> SkylanderPortal::GetStatus()
 {
   std::lock_guard lock(sky_mutex);
 
-  u16 status = 0;
+  u32 status = 0;
   u8 active = 0x00;
 
   if (activated)
@@ -547,7 +607,7 @@ std::array<u8, 64> SkylanderPortal::GetStatus(u8* reply_buf)
     active = 0x01;
   }
 
-  for (int i = 7; i >= 0; i--)
+  for (int i = MAX_SKYLANDERS - 1; i >= 0; i--)
   {
     auto& s = skylanders[i];
 
@@ -559,9 +619,6 @@ std::array<u8, 64> SkylanderPortal::GetStatus(u8* reply_buf)
     status <<= 2;
     status |= s.status;
   }
-
-  std::memset(reply_buf, 0, 0x20);
-  // write_to_ptr<le_t<u16>>(reply_buf, 1, status);
 
   std::array<u8, 64> q_result = {0x53,   0x00, 0x00, 0x00, 0x00, interrupt_counter++,
                                  active, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -645,7 +702,7 @@ u8 SkylanderPortal::LoadSkylander(u8* buf, File::IOFile in_file)
   u8 found_slot = 0xFF;
 
   // mimics spot retaining on the portal
-  for (auto i = 0; i < 8; i++)
+  for (auto i = 0; i < 16; i++)
   {
     if ((skylanders[i].status & 1) == 0)
     {
