@@ -223,6 +223,13 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
           q_data = {buf[0], buf[1], buf[2], buf[3], buf[4]};
           g_skyportal.SetLEDs(buf[1], buf[2], buf[3], buf[4]);
           cmd->expected_count = 13;
+
+          u8 side = buf[1];
+          if (side == 0x02)
+          {
+            side = 0x04;
+          }
+          g_skyportal.SetLEDs(side, buf[2], buf[3], buf[4]);
         }
         break;
       }
@@ -318,8 +325,9 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
       case 'S':
       {
         q_data = {buf[0]};
+        q_result = g_skyportal.GetStatus();
+        q_queries.push(q_result);
         cmd->expected_count = 9;
-        g_skyportal.UpdateStatus();
         break;
       }
       case 'V':
@@ -538,6 +546,13 @@ void SkylanderPortal::Deactivate()
   activated = false;
 }
 
+bool SkylanderPortal::IsActivated()
+{
+  std::lock_guard lock(sky_mutex);
+
+  return activated;
+}
+
 void SkylanderPortal::UpdateStatus()
 {
   std::lock_guard lock(sky_mutex);
@@ -692,7 +707,6 @@ u8 SkylanderPortal::LoadSkylander(u8* buf, File::IOFile in_file)
 {
   std::lock_guard lock(sky_mutex);
 
-  // u32 sky_serial = *utils::bless<le_t<u32>>(buf);
   u32 sky_serial = 0;
   for (int i = 3; i > -1; i--)
   {

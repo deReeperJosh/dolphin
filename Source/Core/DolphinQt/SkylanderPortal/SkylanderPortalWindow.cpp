@@ -1,3 +1,6 @@
+// DolphinQt code copied and modified for Dolphin from the RPCS3 Qt utility for Creating, Loading
+// and Clearing skylanders
+
 #include "DolphinQt/SkylanderPortal/SkylanderPortalWindow.h"
 
 #include <QComboBox>
@@ -16,8 +19,6 @@
 #include <QVBoxLayout>
 
 #include "Common/IOFile.h"
-
-#include "Core/IOS/USB/Emulated/Skylander.h"
 
 #include "DolphinQt/QtUtils/DolphinFileDialog.h"
 
@@ -712,7 +713,7 @@ CreateSkylanderDialog::CreateSkylanderDialog(QWidget* parent) : QDialog(parent)
       return;
     }
 
-    File::IOFile sky_file(file_path.toStdString(), "wb");
+    File::IOFile sky_file(file_path.toStdString(), "w+b");
     if (!sky_file)
     {
       QMessageBox::warning(this, tr("Failed to create skylander file!"),
@@ -736,7 +737,7 @@ CreateSkylanderDialog::CreateSkylanderDialog(QWidget* parent) : QDialog(parent)
     memcpy(&file_data[0], &sky_info, sizeof(sky_info));
     memcpy(&file_data[0x10], &sky_id, sizeof(sky_id));
     memcpy(&file_data[0x1C], &sky_var, sizeof(sky_var));
-    // // Set checksum
+    // Set checksum
     u16 checksum = skylander_crc16(0xFFFF, file_data, 0x1E);
     memcpy(&file_data[0x1E], &checksum, sizeof(checksum));
 
