@@ -7,6 +7,7 @@
 #include <QWidget>
 
 #include "Core/Core.h"
+#include "Core/IOS/USB/Emulated/Skylander.h"
 
 class QDialogButtonBox;
 class QLabel;
@@ -14,7 +15,7 @@ class QPushButton;
 class QSpinBox;
 class QTabWidget;
 
-constexpr auto UI_SKY_NUM = 4;
+constexpr auto UI_SKY_NUM = 16;
 
 class SkylanderPortalWindow : public QWidget
 {
