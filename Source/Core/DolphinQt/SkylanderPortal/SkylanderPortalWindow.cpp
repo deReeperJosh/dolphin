@@ -13,6 +13,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QString>
 #include <QStringList>
 #include <QVBoxLayout>
@@ -567,6 +568,7 @@ void SkylanderPortalWindow::CreateMainWindow()
 
   QGroupBox* group_skylanders = new QGroupBox(tr("Active Portal Skylanders:"));
   QVBoxLayout* vbox_group = new QVBoxLayout();
+  QScrollArea* scroll_area = new QScrollArea();
 
   for (auto i = 0; i < MAX_SKYLANDERS; i++)
   {
@@ -598,7 +600,9 @@ void SkylanderPortalWindow::CreateMainWindow()
   }
 
   group_skylanders->setLayout(vbox_group);
-  mainLayout->addWidget(group_skylanders);
+  scroll_area->setWidget(group_skylanders);
+  scroll_area->setWidgetResizable(true);
+  mainLayout->addWidget(scroll_area);
   setLayout(mainLayout);
 
   UpdateEdits();
@@ -709,7 +713,7 @@ CreateSkylanderDialog::CreateSkylanderDialog(QWidget* parent) : QDialog(parent)
       return;
     }
 
-    File::IOFile sky_file(file_path.toStdString(), "wb");
+    File::IOFile sky_file(file_path.toStdString(), "w+b");
     if (!sky_file)
     {
       QMessageBox::warning(this, tr("Failed to create skylander file!"),
@@ -782,7 +786,7 @@ void SkylanderPortalWindow::LoadSkylander(u8 slot)
 
 void SkylanderPortalWindow::LoadSkylanderPath(u8 slot, const QString& path)
 {
-  File::IOFile sky_file(path.toStdString(), "rb");
+  File::IOFile sky_file(path.toStdString(), "r+b");
   if (!sky_file)
   {
     QMessageBox::warning(

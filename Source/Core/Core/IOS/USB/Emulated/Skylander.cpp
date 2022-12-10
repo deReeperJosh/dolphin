@@ -149,15 +149,7 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
                       0x00, 0x00,   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
           q_queries.push(q_result);
           cmd->expected_count = 10;
-
-          if (q_data[1] == 1)
-          {
-            g_skyportal.Activate();
-          }
-          else
-          {
-            g_skyportal.Deactivate();
-          }
+          g_skyportal.Activate();
         }
         break;
       }
