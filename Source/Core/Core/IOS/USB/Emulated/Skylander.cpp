@@ -198,7 +198,6 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
           cmd->expected_count = 15;
           q_result = {buf[0]};
           q_queries.push(q_result);
-
           g_skyportal.SetLEDs(buf[1], buf[2], buf[3], buf[4]);
         }
         break;
@@ -219,7 +218,6 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
 
         // buf[5] is unknown.
         // A range of values have been observed
-
         if (cmd->length == 5)
         {
           q_data = {buf[0], buf[1], buf[2], buf[3], buf[4]};
@@ -326,8 +324,6 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
       case 'S':
       {
         q_data = {buf[0]};
-        q_result = g_skyportal.GetStatus();
-        q_queries.push(q_result);
         cmd->expected_count = 9;
         break;
       }
@@ -717,7 +713,7 @@ u8 SkylanderPortal::LoadSkylander(u8* buf, File::IOFile in_file)
   u8 found_slot = 0xFF;
 
   // mimics spot retaining on the portal
-  for (auto i = 0; i < 8; i++)
+  for (auto i = 0; i < MAX_SKYLANDERS; i++)
   {
     if ((skylanders[i].status & 1) == 0)
     {
