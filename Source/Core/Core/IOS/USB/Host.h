@@ -83,6 +83,7 @@ private:
 
   bool m_has_initialised = false;
   bool emulate_skylander_portal = true;
+  u64 skylander_portal_id = 0;
   LibusbUtils::Context m_context;
 };
 }  // namespace IOS::HLE
