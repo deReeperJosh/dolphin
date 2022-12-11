@@ -222,6 +222,13 @@ int SkylanderUsb::SubmitTransfer(std::unique_ptr<CtrlMessage> cmd)
         {
           q_data = {buf[0], buf[1], buf[2], buf[3], buf[4]};
           cmd->expected_count = 13;
+
+          u8 side = buf[1];
+          if (side == 0x02)
+          {
+            side = 0x04;
+          }
+          g_skyportal.SetLEDs(side, buf[2], buf[3], buf[4]);
         }
         break;
       }
@@ -540,6 +547,13 @@ void SkylanderPortal::Deactivate()
   }
 
   activated = false;
+}
+
+bool SkylanderPortal::IsActivated()
+{
+  std::lock_guard lock(sky_mutex);
+
+  return activated;
 }
 
 void SkylanderPortal::UpdateStatus()

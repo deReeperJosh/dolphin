@@ -94,6 +94,7 @@ class SkylanderPortal final
 public:
   void Activate();
   void Deactivate();
+  bool IsActivated();
   void UpdateStatus();
   void SetLEDs(u8 side, u8 r, u8 g, u8 b);
 
