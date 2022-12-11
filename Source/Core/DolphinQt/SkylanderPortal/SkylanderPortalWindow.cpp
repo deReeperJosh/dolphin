@@ -737,7 +737,7 @@ CreateSkylanderDialog::CreateSkylanderDialog(QWidget* parent) : QDialog(parent)
     memcpy(&file_data[0], &sky_info, sizeof(sky_info));
     memcpy(&file_data[0x10], &sky_id, sizeof(sky_id));
     memcpy(&file_data[0x1C], &sky_var, sizeof(sky_var));
-    // // Set checksum
+    // Set checksum
     u16 checksum = skylander_crc16(0xFFFF, file_data, 0x1E);
     memcpy(&file_data[0x1E], &checksum, sizeof(checksum));
 
