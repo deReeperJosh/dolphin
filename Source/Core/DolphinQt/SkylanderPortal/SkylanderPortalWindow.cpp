@@ -37,6 +37,9 @@
 #include "DolphinQt/Resources.h"
 #include "DolphinQt/Settings.h"
 
+using Element = IOS::HLE::USB::Element;
+using Game = IOS::HLE::USB::Game;
+
 SkylanderPortalWindow::SkylanderPortalWindow(QWidget* parent) : QWidget(parent)
 {
   setWindowTitle(tr("Skylanders Manager"));
@@ -261,20 +264,20 @@ QVBoxLayout* SkylanderPortalWindow::CreateFinderLayout()
   }
   // i18n: Figures for the game Skylanders: Spyro's Adventure. The game has the same title in all
   // countries it was released in, except Japan, where it's named スカイランダーズ スパイロの大冒険.
-  m_game_filters[GetGameID(IOS::HLE::USB::Game::SpyrosAdv)]->setText(tr("Spyro's Adventure"));
+  m_game_filters[GetGameID(Game::SpyrosAdv)]->setText(tr("Spyro's Adventure"));
   // i18n: Figures for the game Skylanders: Giants. The game has the same title in all countries
   // it was released in. It was not released in Japan.
-  m_game_filters[GetGameID(IOS::HLE::USB::Game::Giants)]->setText(tr("Giants"));
+  m_game_filters[GetGameID(Game::Giants)]->setText(tr("Giants"));
   // i18n: Figures for the game Skylanders: Swap Force. The game has the same title in all countries
   // it was released in. It was not released in Japan.
-  m_game_filters[GetGameID(IOS::HLE::USB::Game::SwapForce)]->setText(tr("Swap Force"));
+  m_game_filters[GetGameID(Game::SwapForce)]->setText(tr("Swap Force"));
   // i18n: Figures for the game Skylanders: Trap Team. The game has the same title in all countries
   // it was released in. It was not released in Japan.
-  m_game_filters[GetGameID(IOS::HLE::USB::Game::TrapTeam)]->setText(tr("Trap Team"));
+  m_game_filters[GetGameID(Game::TrapTeam)]->setText(tr("Trap Team"));
   // i18n: Figures for the games Skylanders: SuperChargers (not available for the Wii) and
   // Skylanders: SuperChargers Racing (available for the Wii). The games have the same titles in
   // all countries they were released in. They were not released in Japan.
-  m_game_filters[GetGameID(IOS::HLE::USB::Game::Superchargers)]->setText(tr("SuperChargers"));
+  m_game_filters[GetGameID(Game::Superchargers)]->setText(tr("SuperChargers"));
   search_checkbox_group->setLayout(search_checkbox_layout);
   search_checkbox_scroll_area->setWidget(search_checkbox_group);
   search_game_layout->addWidget(search_checkbox_scroll_area);
@@ -296,7 +299,7 @@ QVBoxLayout* SkylanderPortalWindow::CreateFinderLayout()
   auto* search_radio_layout = new QHBoxLayout();
 
   auto* radio_layout_left = new QVBoxLayout();
-  for (int i = 0; i < 10; i += 2)
+  for (int i = 0; i < 12; i += 2)
   {
     QRadioButton* radio = new QRadioButton(this);
     radio->setProperty("id", i);
@@ -307,7 +310,7 @@ QVBoxLayout* SkylanderPortalWindow::CreateFinderLayout()
   search_radio_layout->addLayout(radio_layout_left);
 
   auto* radio_layout_right = new QVBoxLayout();
-  for (int i = 1; i < 10; i += 2)
+  for (int i = 1; i < 12; i += 2)
   {
     QRadioButton* radio = new QRadioButton(this);
     radio->setProperty("id", i);
@@ -344,7 +347,13 @@ QVBoxLayout* SkylanderPortalWindow::CreateFinderLayout()
   // translations in other languages, check the SuperChargers manual at
   // https://support.activision.com/manuals
   m_element_filter[8]->setText(tr("Undead"));
-  m_element_filter[9]->setText(tr("Other"));
+  // i18n: One of the elements in the Skylanders games. Japanese: 光. For official translations
+  // in other languages, check the SuperChargers manual at https://support.activision.com/manuals
+  m_element_filter[9]->setText(tr("Light"));
+  // i18n: One of the elements in the Skylanders games. Japanese: やみ. For official translations
+  // in other languages, check the SuperChargers manual at https://support.activision.com/manuals
+  m_element_filter[10]->setText(tr("Dark"));
+  m_element_filter[11]->setText(tr("Other"));
 
   search_radio_group->setLayout(search_radio_layout);
   search_radio_scroll_area->setWidget(search_radio_group);
@@ -770,29 +779,29 @@ bool SkylanderPortalWindow::PassesFilter(QString name, u16 id, u16 var)
   bool pass = false;
 
   // Check against active game filters
-  if (m_game_filters[GetGameID(IOS::HLE::USB::Game::SpyrosAdv)]->isChecked())
+  if (m_game_filters[GetGameID(Game::SpyrosAdv)]->isChecked())
   {
-    if (character.game == IOS::HLE::USB::Game::SpyrosAdv)
+    if (character.game == Game::SpyrosAdv)
       pass = true;
   }
-  if (m_game_filters[GetGameID(IOS::HLE::USB::Game::Giants)]->isChecked())
+  if (m_game_filters[GetGameID(Game::Giants)]->isChecked())
   {
-    if (character.game == IOS::HLE::USB::Game::Giants)
+    if (character.game == Game::Giants)
       pass = true;
   }
-  if (m_game_filters[GetGameID(IOS::HLE::USB::Game::SwapForce)]->isChecked())
+  if (m_game_filters[GetGameID(Game::SwapForce)]->isChecked())
   {
-    if (character.game == IOS::HLE::USB::Game::SwapForce)
+    if (character.game == Game::SwapForce)
       pass = true;
   }
-  if (m_game_filters[GetGameID(IOS::HLE::USB::Game::TrapTeam)]->isChecked())
+  if (m_game_filters[GetGameID(Game::TrapTeam)]->isChecked())
   {
-    if (character.game == IOS::HLE::USB::Game::TrapTeam)
+    if (character.game == Game::TrapTeam)
       pass = true;
   }
-  if (m_game_filters[GetGameID(IOS::HLE::USB::Game::Superchargers)]->isChecked())
+  if (m_game_filters[GetGameID(Game::Superchargers)]->isChecked())
   {
-    if (character.game == IOS::HLE::USB::Game::Superchargers)
+    if (character.game == Game::Superchargers)
       pass = true;
   }
   if (!pass)
@@ -806,39 +815,47 @@ bool SkylanderPortalWindow::PassesFilter(QString name, u16 id, u16 var)
   switch (GetElementRadio())
   {
   case 1:
-    if (character.element != IOS::HLE::USB::Element::Magic)
+    if (character.element != Element::Magic)
       return false;
     break;
   case 2:
-    if (character.element != IOS::HLE::USB::Element::Water)
+    if (character.element != Element::Water)
       return false;
     break;
   case 3:
-    if (character.element != IOS::HLE::USB::Element::Tech)
+    if (character.element != Element::Tech)
       return false;
     break;
   case 4:
-    if (character.element != IOS::HLE::USB::Element::Fire)
+    if (character.element != Element::Fire)
       return false;
     break;
   case 5:
-    if (character.element != IOS::HLE::USB::Element::Earth)
+    if (character.element != Element::Earth)
       return false;
     break;
   case 6:
-    if (character.element != IOS::HLE::USB::Element::Life)
+    if (character.element != Element::Life)
       return false;
     break;
   case 7:
-    if (character.element != IOS::HLE::USB::Element::Air)
+    if (character.element != Element::Air)
       return false;
     break;
   case 8:
-    if (character.element != IOS::HLE::USB::Element::Undead)
+    if (character.element != Element::Undead)
       return false;
     break;
   case 9:
-    if (character.element != IOS::HLE::USB::Element::Other)
+    if (character.element != Element::Light)
+      return false;
+    break;
+  case 10:
+    if (character.element != Element::Dark)
+      return false;
+    break;
+  case 11:
+    if (character.element != Element::Other)
       return false;
     break;
   }
@@ -904,76 +921,82 @@ QBrush SkylanderPortalWindow::GetBaseColor(std::pair<const u16, const u16> ids)
 
   switch ((*skylander).second.game)
   {
-  case IOS::HLE::USB::Game::SpyrosAdv:
+  case Game::SpyrosAdv:
     return QBrush(QColor(240, 255, 240, 255));
-  case IOS::HLE::USB::Game::Giants:
+  case Game::Giants:
     return QBrush(QColor(255, 240, 215, 255));
-  case IOS::HLE::USB::Game::SwapForce:
+  case Game::SwapForce:
     return QBrush(QColor(240, 245, 255, 255));
-  case IOS::HLE::USB::Game::TrapTeam:
+  case Game::TrapTeam:
     return QBrush(QColor(255, 240, 240, 255));
-  case IOS::HLE::USB::Game::Superchargers:
+  case Game::Superchargers:
     return QBrush(QColor(247, 228, 215, 255));
   default:
     return QBrush(QColor(255, 255, 255, 255));
   }
 }
 
-int SkylanderPortalWindow::GetGameID(IOS::HLE::USB::Game game)
+int SkylanderPortalWindow::GetGameID(Game game)
 {
   switch (game)
   {
-  case IOS::HLE::USB::Game::SpyrosAdv:
+  case Game::SpyrosAdv:
     return 0;
 
-  case IOS::HLE::USB::Game::Giants:
+  case Game::Giants:
     return 1;
 
-  case IOS::HLE::USB::Game::SwapForce:
+  case Game::SwapForce:
     return 2;
 
-  case IOS::HLE::USB::Game::TrapTeam:
+  case Game::TrapTeam:
     return 3;
 
-  case IOS::HLE::USB::Game::Superchargers:
+  case Game::Superchargers:
     return 4;
 
-  case IOS::HLE::USB::Game::Other:
+  case Game::Other:
     return 5;
   }
   return -1;
 }
 
-int SkylanderPortalWindow::GetElementID(IOS::HLE::USB::Element elem)
+int SkylanderPortalWindow::GetElementID(Element elem)
 {
   switch (elem)
   {
-  case IOS::HLE::USB::Element::Magic:
+  case Element::Magic:
     return 0;
 
-  case IOS::HLE::USB::Element::Fire:
+  case Element::Fire:
     return 1;
 
-  case IOS::HLE::USB::Element::Air:
+  case Element::Air:
     return 2;
 
-  case IOS::HLE::USB::Element::Life:
+  case Element::Life:
     return 3;
 
-  case IOS::HLE::USB::Element::Undead:
+  case Element::Undead:
     return 4;
 
-  case IOS::HLE::USB::Element::Earth:
+  case Element::Earth:
     return 5;
 
-  case IOS::HLE::USB::Element::Water:
+  case Element::Water:
     return 6;
 
-  case IOS::HLE::USB::Element::Tech:
+  case Element::Tech:
     return 7;
 
-  case IOS::HLE::USB::Element::Other:
+  case Element::Light:
     return 8;
+
+  case Element::Dark:
+    return 9;
+
+  case Element::Other:
+    return 10;
   }
   return -1;
 }

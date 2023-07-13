@@ -90,7 +90,7 @@ private:
   QPushButton* m_path_select;
 
   std::array<QCheckBox*, 5> m_game_filters;
-  std::array<QRadioButton*, 10> m_element_filter;
+  std::array<QRadioButton*, 12> m_element_filter;
   QCheckBox* m_only_show_collection;
   QLineEdit* m_sky_search;
   QListWidget* m_skylander_list;

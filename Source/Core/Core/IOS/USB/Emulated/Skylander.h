@@ -38,6 +38,8 @@ enum class Element
   Earth,
   Water,
   Tech,
+  Light,
+  Dark,
   Other
 };
 
