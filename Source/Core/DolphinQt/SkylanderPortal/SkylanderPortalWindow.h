@@ -14,7 +14,7 @@
 #include <QWidget>
 
 #include "Core/Core.h"
-#include "Core/IOS/USB/Emulated/Skylander.h"
+#include "Core/IOS/USB/Emulated/Skylanders/Skylander.h"
 
 class QCheckBox;
 class QGroupBox;

@@ -30,7 +30,7 @@
 
 #include "Common/FileUtil.h"
 #include "Core/Config/MainSettings.h"
-#include "Core/IOS/USB/Emulated/Skylander.h"
+#include "Core/IOS/USB/Emulated/Skylanders/Skylander.h"
 #include "Core/System.h"
 
 #include "DolphinQt/QtUtils/DolphinFileDialog.h"
