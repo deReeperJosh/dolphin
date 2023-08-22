@@ -655,55 +655,70 @@ void SkylanderPortalWindow::ModifySkylander()
 {
   if (auto sky_slot = m_sky_slots[GetCurrentSlot()])
   {
-    // Get Skylander Information by calling a method via
-    // Core::System::GetInstance().GetSkylanderPortal().GetSkylanderData()
     QDialog* modify_window = new QDialog;
 
     auto* layout = new QVBoxLayout;
-
-    auto* hbox_name = new QHBoxLayout;
-    // Update Placeholder name with name retrieved via method above
-    auto* label_name =
-        new QLabel(QString::fromStdString("Modifying Skylander " + std::string("Placeholder")));
 
     IOS::HLE::USB::Skylander* skylander =
         Core::System::GetInstance().GetSkylanderPortal().GetSkylander(sky_slot.value().portal_slot);
 
     IOS::HLE::USB::FigureData figureData = skylander->figure->GetData();
 
-    auto* hbox_money = new QHBoxLayout();
-    auto* label_money = new QLabel(tr("Money:"));
-    auto* edit_money = new QLineEdit(tr("%1").arg(figureData.skylanderData.money));
-
-    auto* hbox_hero = new QHBoxLayout();
-    auto* label_hero = new QLabel(tr("Hero level:"));
-    auto* edit_hero = new QLineEdit(tr("%1").arg(figureData.skylanderData.heroLevel));
-
-    auto toUtf16 = QStringDecoder(QStringDecoder::Utf16);
-    auto* hbox_nick = new QHBoxLayout();
-    auto* label_nick = new QLabel(tr("Nickname:"));
-    auto* edit_nick = new QLineEdit(QString::fromUtf16((char16_t*)figureData.skylanderData.nickname));
-
-    edit_money->setValidator(new QIntValidator(0, 65000, this));
-    edit_hero->setValidator(new QIntValidator(0, 100, this));
-    edit_nick->setValidator(new QRegularExpressionValidator(
-        QRegularExpression(QString::fromStdString("^\\p{L}{1,15}$")), this));
-
-    hbox_name->addWidget(label_name);
-
-    hbox_money->addWidget(label_money);
-    hbox_money->addWidget(edit_money);
-
-    hbox_hero->addWidget(label_hero);
-    hbox_hero->addWidget(edit_hero);
-
-    hbox_nick->addWidget(label_nick);
-    hbox_nick->addWidget(edit_nick);
+    auto* hbox_name = new QHBoxLayout;
+    auto* label_name = new QLabel(QString::fromStdString(
+        "Modifying Skylander " +
+        ((figureData.skylanderData.nickname[0] != 0x00 && figureData.normalizedType == (u8)Type::Skylander) ?
+             "\"" + QString::fromUtf16((char16_t*)figureData.skylanderData.nickname).toStdString() +
+                 "\"" :
+             "TBA")));
 
     layout->addLayout(hbox_name);
-    layout->addLayout(hbox_money);
-    layout->addLayout(hbox_hero);
-    layout->addLayout(hbox_nick);
+
+    if (figureData.normalizedType == (u8)Type::Skylander)
+    {
+      auto* hbox_money = new QHBoxLayout();
+      auto* label_money = new QLabel(tr("Money:"));
+      auto* edit_money = new QLineEdit(tr("%1").arg(figureData.skylanderData.money));
+
+      auto* hbox_hero = new QHBoxLayout();
+      auto* label_hero = new QLabel(tr("Hero level:"));
+      auto* edit_hero = new QLineEdit(tr("%1").arg(figureData.skylanderData.heroLevel));
+
+      auto toUtf16 = QStringDecoder(QStringDecoder::Utf16);
+      auto* hbox_nick = new QHBoxLayout();
+      auto* label_nick = new QLabel(tr("Nickname:"));
+      auto* edit_nick =
+          new QLineEdit(QString::fromUtf16((char16_t*)figureData.skylanderData.nickname));
+
+      auto* hbox_playtime = new QHBoxLayout();
+      auto* label_playtime = new QLabel(tr("Playtime:"));
+      auto* edit_playtime = new QLineEdit(tr("%1").arg(figureData.skylanderData.playtime));
+
+      edit_money->setValidator(new QIntValidator(0, 65000, this));
+      edit_hero->setValidator(new QIntValidator(0, 100, this));
+      edit_nick->setValidator(new QRegularExpressionValidator(
+          QRegularExpression(QString::fromStdString("^\\p{L}{1,15}$")), this));
+      edit_playtime->setValidator(new QIntValidator(0, UINT_MAX, this));
+
+      hbox_name->addWidget(label_name);
+
+      hbox_money->addWidget(label_money);
+      hbox_money->addWidget(edit_money);
+
+      hbox_hero->addWidget(label_hero);
+      hbox_hero->addWidget(edit_hero);
+
+      hbox_nick->addWidget(label_nick);
+      hbox_nick->addWidget(edit_nick);
+
+      hbox_playtime->addWidget(label_playtime);
+      hbox_playtime->addWidget(edit_playtime);
+
+      layout->addLayout(hbox_money);
+      layout->addLayout(hbox_hero);
+      layout->addLayout(hbox_nick);
+      layout->addLayout(hbox_playtime);
+    }
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     buttons->button(QDialogButtonBox::Ok)->setText(tr("Save"));
