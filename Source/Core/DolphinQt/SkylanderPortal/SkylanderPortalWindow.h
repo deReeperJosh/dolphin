@@ -15,6 +15,7 @@
 
 #include "Core/Core.h"
 #include "Core/IOS/USB/Emulated/Skylanders/Skylander.h"
+#include "Core/IOS/USB/Emulated/Skylanders/SkylanderFigure.h"
 
 class QCheckBox;
 class QGroupBox;
@@ -64,6 +65,7 @@ private:
   void LoadFromFile();
   void ClearSlot(u8 slot);
   void CreateSkylanderAdvanced();
+  void ModifySkylander();
 
   // Behind the scenes
   void OnEmulationStateChanged(Core::State state);

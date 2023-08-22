@@ -7,7 +7,7 @@
 
 #include "AndroidCommon/AndroidCommon.h"
 #include "AndroidCommon/IDCache.h"
-#include "Core/IOS/USB/Emulated/Skylander.h"
+#include "Core/IOS/USB/Emulated/Skylanders/Skylander.h"
 #include "Core/System.h"
 
 extern "C" {
