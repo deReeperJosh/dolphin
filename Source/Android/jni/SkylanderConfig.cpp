@@ -107,11 +107,12 @@ Java_org_dolphinemu_dolphinemu_features_skylanders_SkylanderConfig_loadSkylander
     name = it->second.name;
   }
 
-  return env->NewObject(pair_class, pair_init,
-                        env->NewObject(integer_class, int_init,
-                                       system.GetSkylanderPortal().LoadSkylander(
-                                           file_data.data(), std::move(sky_file))),
-                        ToJString(env, name));
+  return env->NewObject(
+      pair_class, pair_init,
+      env->NewObject(integer_class, int_init,
+                     system.GetSkylanderPortal().LoadSkylander(
+                         new IOS::HLE::USB::SkylanderFigure(std::move(sky_file)))),
+      ToJString(env, name));
 }
 
 JNIEXPORT jobject JNICALL
@@ -124,7 +125,10 @@ Java_org_dolphinemu_dolphinemu_features_skylanders_SkylanderConfig_createSkyland
   std::string file_name = GetJString(env, fileName);
 
   auto& system = Core::System::GetInstance();
-  system.GetSkylanderPortal().CreateSkylander(file_name, sky_id, sky_var);
+  IOS::HLE::USB::SkylanderFigure* figure = new IOS::HLE::USB::SkylanderFigure(file_name);
+  figure->Create(sky_id, sky_var);
+  figure->Close();
+  delete figure;
   system.GetSkylanderPortal().RemoveSkylander(slot);
 
   jclass pair_class = env->FindClass("android/util/Pair");
@@ -154,10 +158,11 @@ Java_org_dolphinemu_dolphinemu_features_skylanders_SkylanderConfig_createSkyland
     name = it->second.name;
   }
 
-  return env->NewObject(pair_class, pair_init,
-                        env->NewObject(integer_class, integer_init,
-                                       system.GetSkylanderPortal().LoadSkylander(
-                                           file_data.data(), std::move(sky_file))),
-                        ToJString(env, name));
+  return env->NewObject(
+      pair_class, pair_init,
+      env->NewObject(integer_class, integer_init,
+                     system.GetSkylanderPortal().LoadSkylander(
+                         new IOS::HLE::USB::SkylanderFigure(std::move(sky_file)))),
+      ToJString(env, name));
 }
 }
