@@ -44,6 +44,8 @@
 #include "Core/PowerPC/PowerPC.h"
 #include "Core/System.h"
 
+#include "IOS/USB/Emulated/Skylander.h"
+
 #include "VideoCommon/FrameDumpFFMpeg.h"
 #include "VideoCommon/OnScreenDisplay.h"
 #include "VideoCommon/VideoBackendBase.h"
@@ -93,7 +95,7 @@ static size_t s_state_writes_in_queue;
 static std::condition_variable s_state_write_queue_is_empty;
 
 // Don't forget to increase this after doing changes on the savestate system
-constexpr u32 STATE_VERSION = 163;  // Last changed in PR 12217
+constexpr u32 STATE_VERSION = 164;  // Last changed in PR 12202
 
 // Increase this if the StateExtendedHeader definition changes
 constexpr u32 EXTENDED_HEADER_VERSION = 1;  // Last changed in PR 12217
@@ -194,6 +196,10 @@ static void DoState(PointerWrap& p)
   p.DoMarker("Wiimote");
   Gecko::DoState(p);
   p.DoMarker("Gecko");
+
+  // Save the State of the Emulated Portal
+  system.GetSkylanderPortal().DoState(p);
+  p.DoMarker("SkylanderPortal");
 }
 
 void LoadFromBuffer(std::vector<u8>& buffer)

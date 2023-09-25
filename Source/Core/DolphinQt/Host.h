@@ -42,6 +42,7 @@ signals:
   void RequestStop();
   void RequestRenderSize(int w, int h);
   void UpdateDisasmDialog();
+  void UpdateSkylanderWindow();
   void NotifyMapLoaded();
 
 private:
