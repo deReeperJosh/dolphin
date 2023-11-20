@@ -185,7 +185,7 @@ void USBHost::DispatchHooks(const DeviceChangeHooks& hooks)
 void USBHost::AddEmulatedDevices(std::set<u64>& new_devices, DeviceChangeHooks& hooks,
                                  bool always_add_hooks)
 {
-  if (Config::Get(Config::MAIN_EMULATE_SKYLANDER_PORTAL) && !NetPlay::IsNetPlayRunning())
+  if (Config::Get(Config::MAIN_EMULATE_SKYLANDER_PORTAL))
   {
     auto skylanderportal =
         std::make_unique<USB::SkylanderUSB>(GetEmulationKernel(), "Skylander Portal");
